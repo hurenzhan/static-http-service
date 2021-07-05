@@ -1,0 +1,32 @@
+#! /usr/bin/env node
+
+const {program} = require("commander");
+const {version} = require('../package.json');
+const config = require('./config');
+const Server = require('../src/main.js')
+
+program.version(version)
+    .name('hs')
+    .usage('[options]');
+
+const usages = [];
+// 添加配置信息
+Object.entries(config).forEach(([key, value]) => {
+  usages.push(value.usage);
+  program.option(value.option, value.description, value.default)
+});
+
+// 示例
+program.on('--help', function () {
+  console.log('\nExamples:')
+  usages.forEach(usage => console.log('  ' + usage))
+});
+
+program.parse(process.argv);
+
+// 用户输入参数
+const ops = program.opts();
+
+// 启动服务
+const server = new Server(ops);
+server.start(); // 开启服务
